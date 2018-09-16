@@ -18,7 +18,7 @@ namespace test_lab1
         {
             if (value < 0)
                 value = 0;
-            else if (value > 10)
+            else if (value > 10) 
                 value = 10;
 
             this.value = value;
