@@ -23,5 +23,5 @@ namespace test_lab1
 
             this.value = value;
         }
-    }  
+    }
 }
