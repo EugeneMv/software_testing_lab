@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace test_lab1
 {
-    class Note 
+    class Note  
     { 
         private int value;
         public int Value {
