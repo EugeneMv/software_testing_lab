@@ -13,7 +13,6 @@ namespace FrameworkUnitTest
         private FrameworkUnitTest.Steps steps = new FrameworkUnitTest.Steps();
         private const string depatureName = "";
         private const string destinationName = "Berlin, Germany";
-        private bool status = false;
         [SetUp]
         public void Init()
         {
@@ -32,8 +31,8 @@ namespace FrameworkUnitTest
         {
             steps.SelectPage();
             steps.SelectFirstTrip(depatureName, destinationName);
-            status = steps.StartSearchTickets();
-            NUnit.Framework.Assert.AreEqual(status, true);
+            var count = steps.StartSearchTickets();
+            NUnit.Framework.Assert.AreNotEqual(count, 0);
         }
     }
 

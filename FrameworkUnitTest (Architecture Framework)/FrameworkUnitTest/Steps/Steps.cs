@@ -38,11 +38,10 @@ namespace FrameworkUnitTest
             return true;
         }
 
-        public bool StartSearchTickets()
+        public int StartSearchTickets()
         {
-            FrameworkUnitTest.MainPage mainPage = new FrameworkUnitTest.MainPage(driver);
-            mainPage.ClickOnSearchTickets();
-            return true;
+            FrameworkUnitTest.MainPage mainPage = new FrameworkUnitTest.MainPage(driver);        
+            return mainPage.ClickOnSearchTickets();
         }
 
         public void SelectPage()

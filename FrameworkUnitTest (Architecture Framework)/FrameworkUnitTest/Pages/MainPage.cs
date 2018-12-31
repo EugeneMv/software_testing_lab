@@ -47,9 +47,13 @@ namespace FrameworkUnitTest
             System.Threading.Thread.Sleep(1000);
         }
 
-        public void ClickOnSearchTickets()
+        public int ClickOnSearchTickets()
         {
             Submit.Click();
+            System.Threading.Thread.Sleep(7000);
+            List<String> tabs = new List<String>(driver.WindowHandles);
+            driver.SwitchTo().Window(tabs[1]);
+            return driver.FindElement(By.CssSelector("#flightsResultsMaster > div > div > div:nth-child(4)")).FindElements(By.ClassName("fltrt-opt-region")).Count;
         }
 
         public void InsertTrip(string departure, string destination)
