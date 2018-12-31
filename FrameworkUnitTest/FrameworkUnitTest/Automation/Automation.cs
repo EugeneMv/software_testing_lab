@@ -32,7 +32,7 @@ namespace FrameworkUnitTest
             steps.SelectPage();
             steps.SelectFirstTrip(depatureName, destinationName);
             var count = steps.StartSearchTickets();
-            NUnit.Framework.Assert.AreNotEqual(count, 0);
+            NUnit.Framework.Assert.AreNotEqual(count, 0); 
         }
     }
 
