@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Assert = NUnit.Framework.Assert;
+
 namespace FrameworkUnitTest
 {
     [TestFixture]
@@ -13,12 +15,11 @@ namespace FrameworkUnitTest
         private FrameworkUnitTest.Steps steps = new FrameworkUnitTest.Steps();
         private const string depatureName = "Minsk, Belarus";
         private const string destinationName = "Berlin, Germany";
-        private const string destinationName2 = "Paris, France";
+        private const string destinationName2 = "Frankfurt, Germany";
         [SetUp]
         public void Init()
         {
             steps.InitBrowser();
-            System.Threading.Thread.Sleep(1000);
         }
 
         [TearDown]
@@ -30,126 +31,116 @@ namespace FrameworkUnitTest
         [Test]
         public void TwoWayTrips()
         {
-            steps.SelectPage();
-            steps.SelectTripsTwoWay(depatureName, destinationName);
+            steps.SelectMainPage();
+            steps.InsertSelectionData2Way(depatureName, destinationName);
             steps.StartSearchTickets();
-            steps.ListPage();
+            steps.SelectListPage();
 
-            var count = steps.ListCount();
-            NUnit.Framework.Assert.AreNotEqual(count, 0);
+            Assert.AreNotEqual(steps.ListCount(), 0);
         }
 
         [Test]
         public void OneWayTrips()
         {
-            steps.SelectPage();
-            steps.SelectTripsOneWay(depatureName, destinationName);
+            steps.SelectMainPage();
+            steps.InsertSelectionDataWay(depatureName, destinationName);
             steps.StartSearchTickets();
-            steps.ListPage();
+            steps.SelectListPage();
 
-            var count = steps.ListCount();
-            NUnit.Framework.Assert.AreNotEqual(count, 0);
+            Assert.AreNotEqual(steps.ListCount(), 0);
         }
 
         [Test]
         public void TripsWithTransfer()
         {
-            steps.SelectPage();
-            steps.SelectTripsTransfer(depatureName, destinationName, destinationName2);
+            steps.SelectMainPage();
+            steps.InsertSelectionDataTransferWay(depatureName, destinationName, destinationName2);
             steps.StartSearchTickets();
-            steps.ListPage();
+            steps.SelectListPage();
 
-            var count = steps.ListCount();
-            NUnit.Framework.Assert.AreNotEqual(count, 0);
+            Assert.AreNotEqual(steps.ListCount(), 0);
         }
 
         [Test]
         public void BusinessTrip()
         {
-            steps.SelectPage();
-            steps.SelectTripsTwoWay(depatureName, destinationName);
-            steps.SelectFilterBusiness();
+            steps.SelectMainPage();
+            steps.InsertBusinessSelectionData2Way(depatureName, destinationName);
             steps.StartSearchTickets();
-            steps.ListPage();
+            steps.SelectListPage();
 
-            var count = steps.ListCount();
-            NUnit.Framework.Assert.AreNotEqual(count, 0);
+            Assert.AreNotEqual(steps.ListCount(), 0);
         }
 
         [Test]
         public void TripWithTimeFilter()
         {
-            steps.SelectPage();
-            steps.SelectTripsTwoWay(depatureName, destinationName);
+            steps.SelectMainPage();
+            steps.InsertSelectionData2Way(depatureName, destinationName);
             steps.StartSearchTickets();
-            steps.ListPage();
-            steps.SetTimeFilter();
+            steps.SelectListPage();
+            steps.SetFilter(Steps.ListFilter.Time);
 
-            var count = steps.ListCount();
-            NUnit.Framework.Assert.AreNotEqual(count, 0);
+            Assert.AreNotEqual(steps.ListCount(), 0);
         }
 
         [Test]
         public void TripWithNonStopFilter()
         {
-            steps.SelectPage();
-            steps.SelectTripsTwoWay(destinationName, destinationName2);
+            steps.SelectMainPage();
+            steps.InsertSelectionData2Way(depatureName, destinationName);
             steps.StartSearchTickets();
-            steps.ListPage();
-            steps.SetNonStopFilter();
+            steps.SelectListPage();
+            steps.SetFilter(Steps.ListFilter.Nonstop);
 
-            var count = steps.ListCount();
-            NUnit.Framework.Assert.AreNotEqual(count, 0);
+            Assert.AreNotEqual(steps.ListCount(), 0);
         }
 
         [Test]
         public void TripWithAirportsFilter()
         {
-            steps.SelectPage();
-            steps.SelectTripsTwoWay(destinationName, destinationName2);
+            steps.SelectMainPage();
+            steps.InsertSelectionData2Way(depatureName, destinationName);
             steps.StartSearchTickets();
-            steps.ListPage();
-            steps.SetAirportsFilter();
+            steps.SelectListPage();
+            steps.SetFilter(Steps.ListFilter.Airports);
 
-            var count = steps.ListCount();
-            NUnit.Framework.Assert.AreNotEqual(count, 0);
+            Assert.AreNotEqual(steps.ListCount(), 0);
         }
 
         [Test]
         public void CompareTwoTrips()
         {
-            steps.SelectPage();
-            steps.SelectTripsTwoWay(destinationName, destinationName2);
+            steps.SelectMainPage();
+            steps.InsertSelectionData2Way(depatureName, destinationName);
             steps.StartSearchTickets();
-            steps.ListPage();
+            steps.SelectListPage();
 
-            NUnit.Framework.Assert.IsTrue(steps.CheckComparer());
+            Assert.IsTrue(steps.CheckComparer());
         }
 
         [Test]
         public void ComparePricesChild()
         {
-            steps.SelectPage();
-            steps.SelectTripsTwoWay(depatureName, destinationName);
-            steps.AddChild();
+            steps.SelectMainPage();
+            steps.InsertSelectionData2Way(depatureName, destinationName);
+            steps.AddPassenger(Steps.Passenger.Child);
             steps.StartSearchTickets();
-            steps.ListPage();
-
-            var count = steps.ListCount();
-            NUnit.Framework.Assert.IsTrue(steps.CheckPriceChild());
+            steps.SelectListPage();
+            
+            Assert.IsTrue(steps.CheckPrice(Steps.Passenger.Child));
         }
 
         [Test]
         public void ComparePricesSenior()
         {
-            steps.SelectPage();
-            steps.SelectTripsTwoWay(depatureName, destinationName);
-            steps.AddSenior();
+            steps.SelectMainPage();
+            steps.InsertSelectionData2Way(depatureName, destinationName);
+            steps.AddPassenger(Steps.Passenger.Senior);
             steps.StartSearchTickets();
-            steps.ListPage();
+            steps.SelectListPage();
 
-            var count = steps.ListCount();
-            NUnit.Framework.Assert.IsTrue(steps.CheckPriceSenior());
+            Assert.IsTrue(steps.CheckPrice(Steps.Passenger.Senior));
         }
     }
 

@@ -12,7 +12,7 @@ using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium.Support.PageObjects;
 using System.Security.Policy;
 using System.Threading;
-
+using System.Globalization;
 
 namespace FrameworkUnitTest
 {
@@ -29,104 +29,143 @@ namespace FrameworkUnitTest
             FrameworkUnitTest.Instance.CloseBrowser();
         }
 
-        public void SelectPage()
+        public void SelectMainPage()
         {
             FrameworkUnitTest.MainPage mainPage = new FrameworkUnitTest.MainPage(driver);
             mainPage.OpenPage();
         }
 
-        public void SelectTripsTwoWay(string departureName, string destinationName)
+        public void SelectListPage()
         {
-            FrameworkUnitTest.MainPage mainPage = new FrameworkUnitTest.MainPage(driver);        
-            mainPage.InsertTripTwoWay(departureName, destinationName);         
-            mainPage.ChooseTrip2Dates();
-            System.Threading.Thread.Sleep(1000);
+            FrameworkUnitTest.ListPage listPage = new FrameworkUnitTest.ListPage(driver);
+            listPage.OpenPage();
         }
 
-        public void SelectTripsOneWay(string departureName, string destinationName)
+        public void InsertSelectionData2Way(string departureName, string destinationName)
         {
             FrameworkUnitTest.MainPage mainPage = new FrameworkUnitTest.MainPage(driver);
-            mainPage.InsertTripOneWay(departureName, destinationName);
-            mainPage.ChooseTripDate();
-            System.Threading.Thread.Sleep(1000);
+            mainPage.InsertDeparturePlace(departureName);
+            mainPage.InsertDestinationPlace(destinationName);
+            mainPage.ToCalendar();
+            mainPage.ChooseTripDateFrom();
+            mainPage.ChooseTripDateTo();
         }
 
-        public void SelectTripsTransfer(string departureName, string destinationName, string destinationName2)
+        public void InsertSelectionDataWay(string departureName, string destinationName)
         {
             FrameworkUnitTest.MainPage mainPage = new FrameworkUnitTest.MainPage(driver);
-            mainPage.InsertTripTransfer(departureName, destinationName, destinationName2);
-            System.Threading.Thread.Sleep(1000);
+            mainPage.SetType(MainPage.Types.OneWay);
+            mainPage.InsertDeparturePlace(departureName);
+            mainPage.InsertDestinationPlace(destinationName);
+            mainPage.ToCalendar();
+            mainPage.ChooseTripDateFrom();
         }
+
+        public void InsertSelectionDataTransferWay(string departureName, string destinationName, string destinationName2)
+        {
+            FrameworkUnitTest.MainPage mainPage = new FrameworkUnitTest.MainPage(driver);
+            mainPage.SetType(MainPage.Types.Transfer);
+            mainPage.InsertDeparturePlace(departureName);
+            mainPage.InsertDestinationPlace(destinationName);
+            mainPage.ChooseTripDateFrom();
+            mainPage.AddLeg();
+            mainPage.InsertDestination2Place(destinationName2);
+            mainPage.ChooseTripDateTo();
+        }
+
+        public void InsertBusinessSelectionData2Way(string departureName, string destinationName)
+        {
+            FrameworkUnitTest.MainPage mainPage = new FrameworkUnitTest.MainPage(driver);
+            mainPage.InsertDeparturePlace(departureName);
+            mainPage.InsertDestinationPlace(destinationName);
+            mainPage.ToCalendar();
+            mainPage.ChooseTripDateFrom();
+            mainPage.ChooseTripDateTo();
+            mainPage.SetBusinessType();
+        }
+
 
         public void StartSearchTickets()
         {
             FrameworkUnitTest.MainPage mainPage = new FrameworkUnitTest.MainPage(driver);
             mainPage.ClickOnSearchTickets();
         }
-
-        public void AddChild()
-        {
-            FrameworkUnitTest.MainPage mainPage = new FrameworkUnitTest.MainPage(driver);
-            mainPage.AddChild();
-        }
-
-        public void AddSenior()
-        {
-            FrameworkUnitTest.MainPage mainPage = new FrameworkUnitTest.MainPage(driver);
-            mainPage.AddSenior();
-        }
-
-        public void SelectFilterBusiness()
-        {
-            FrameworkUnitTest.MainPage mainPage = new FrameworkUnitTest.MainPage(driver);
-            mainPage.SelectBusinessType();
-        }
-
-        public void ListPage()
-        {
-            FrameworkUnitTest.ListPage listPage = new FrameworkUnitTest.ListPage(driver);
-            listPage.OpenPage();
-        }
-
+        
         public int ListCount()
         {
             FrameworkUnitTest.ListPage listPage = new FrameworkUnitTest.ListPage(driver);
             return listPage.Count();
         }
 
-        public void SetTimeFilter()
+        public enum ListFilter
         {
-            FrameworkUnitTest.ListPage listPage = new FrameworkUnitTest.ListPage(driver);
-            listPage.SetTimeFilter();
+            Time,
+            Nonstop,
+            Airports
         }
 
-        public void SetNonStopFilter()
+        public void SetFilter(ListFilter filter)
         {
             FrameworkUnitTest.ListPage listPage = new FrameworkUnitTest.ListPage(driver);
-            listPage.SetNonStopFilter();
+            switch (filter)
+            {
+                case ListFilter.Airports:
+                    listPage.SetAirportsFilter();
+                    break;
+                case ListFilter.Time:
+                    listPage.SetTimeFilter();
+                    break;
+                case ListFilter.Nonstop:
+                    listPage.SetNonStopFilter();
+                    break;
+            }
         }
-
-        public void SetAirportsFilter()
-        {
-            FrameworkUnitTest.ListPage listPage = new FrameworkUnitTest.ListPage(driver);
-            listPage.SetAirportsFilter();
-        }
-
+       
         public bool CheckComparer()
         {
-            FrameworkUnitTest.ListPage listPage = new FrameworkUnitTest.ListPage(driver);
+            ListPage listPage = new ListPage(driver);
             return listPage.CheckComparer();
         }
 
-        public bool CheckPriceChild() {
-            FrameworkUnitTest.ListPage listPage = new FrameworkUnitTest.ListPage(driver);
-            return listPage.ComparePricesChild();
+        public bool CheckPrice(Passenger passenger) {
+            ListPage listPage = new ListPage(driver);
+            double first_price = 0, second_price = 0;
+            listPage.OpenReviewTrips();
+            
+            switch (passenger)
+            {
+                case Passenger.Child:
+                    first_price = double.Parse(listPage.FirstPriceC.Text, CultureInfo.InvariantCulture);
+                    second_price = double.Parse(listPage.SecondPriceC.Text, CultureInfo.InvariantCulture);
+                    break;
+                case Passenger.Senior:
+                    first_price = double.Parse(listPage.FirstPriceS.Text, CultureInfo.InvariantCulture);
+                    second_price = double.Parse(listPage.SecondPriceS.Text, CultureInfo.InvariantCulture);
+                    break;
+            }
+            var current_price = double.Parse(listPage.CurrentPriceS.Text, CultureInfo.InvariantCulture);
+            
+            return Math.Abs((first_price + second_price) - current_price) < 0.01;
         }
 
-        public bool CheckPriceSenior()
+        public enum Passenger
         {
-            FrameworkUnitTest.ListPage listPage = new FrameworkUnitTest.ListPage(driver);
-            return listPage.ComparePricesSenior();
+            Child,
+            Senior
+        }
+
+        public void AddPassenger(Passenger passenger)
+        {
+            MainPage mainPage = new MainPage(driver);
+            switch (passenger)
+            {
+                case Passenger.Child:
+                    mainPage.AddChild();
+                    break;
+                case Passenger.Senior:
+                    mainPage.AddSenior();
+                    break;
+            }
         }
     }
 }

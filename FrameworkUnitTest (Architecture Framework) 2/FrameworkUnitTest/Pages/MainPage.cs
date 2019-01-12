@@ -20,7 +20,8 @@ namespace FrameworkUnitTest
     {
         private const string URL = "https://www.cheapair.com/";
         private IWebDriver driver;
-        
+        private WebDriverWait waiter;
+
         [FindsBy(How = How.XPath, Using = "//*[@id=\"tripTypeContainer\"]/div/label[2]")]
         public IWebElement Type1;
 
@@ -45,10 +46,10 @@ namespace FrameworkUnitTest
         [FindsBy(How = How.CssSelector, Using = "#dates")]
         public IWebElement Dates;
 
-        [FindsBy(How = How.CssSelector, Using = "#datePickerContainer > div > div.ui-datepicker-group.ui-datepicker-group-last > table > tbody > tr:nth-child(3) > td:nth-child(1)")]
+        [FindsBy(How = How.XPath, Using = "//*[@id=\"datePickerContainer\"]/div/div[2]/table/tbody/tr[3]/td[1]")]
         public IWebElement DaysFrom;
 
-        [FindsBy(How = How.CssSelector, Using = "#datePickerContainer > div > div.ui-datepicker-group.ui-datepicker-group-last > table > tbody > tr:nth-child(4) > td:nth-child(7)")]
+        [FindsBy(How = How.XPath, Using = "//*[@id=\"datePickerContainer\"]/div/div[2]/table/tbody/tr[4]/td[7]")]
         public IWebElement DaysTo;
 
         [FindsBy(How = How.XPath, Using = "//*[@id=\"fltSearchForm\"]/button")]
@@ -64,103 +65,97 @@ namespace FrameworkUnitTest
         {
             this.driver = driver;
             PageFactory.InitElements(this.driver, this);
+            waiter = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
         }
 
         public void OpenPage()
         {
             driver.Navigate().GoToUrl(URL);
-            System.Threading.Thread.Sleep(1000);
+            waiter.Until(ExpectedConditions.ElementExists(By.CssSelector("#fltSearchContainer")));
         }
 
         public void ClickOnSearchTickets()
         {
             Submit.Click();
-            System.Threading.Thread.Sleep(7000);
         }
 
-        public void InsertTripOneWay(string departure, string destination)
+        public void InsertDeparturePlace(string departure)
         {
-            Type1.Click();
             PlaceFrom.Clear();
             PlaceFrom.SendKeys(departure);
-            System.Threading.Thread.Sleep(1000);
             PlaceFrom.Click();
+        }
 
+        public void InsertDestinationPlace(string destination)
+        {
             PlaceTo.Clear();
             PlaceTo.SendKeys(destination);
-            System.Threading.Thread.Sleep(1000);
             PlaceTo.Click();
         }
 
-        public void InsertTripTwoWay(string departure, string destination)
+        public void InsertDestination2Place(string destination)
         {
-            PlaceFrom.Clear();
-            PlaceFrom.SendKeys(departure);
-            System.Threading.Thread.Sleep(1000);
-            PlaceFrom.Click();
-
-            PlaceTo.Clear();
-            PlaceTo.SendKeys(destination);
-            System.Threading.Thread.Sleep(1000);
-            PlaceTo.Click();
-        }
-
-        public void InsertTripTransfer(string departure, string destination, string destination2)
-        {
-            Type2.Click();
-
-            PlaceTo.Clear();
-            PlaceTo.SendKeys(destination);
-            System.Threading.Thread.Sleep(500);
-
-            PlaceFrom.Clear();
-            PlaceFrom.SendKeys(departure);
-
-            DaysFrom.Click();
-            System.Threading.Thread.Sleep(500);
-            AnotherLeg.Click();
-            System.Threading.Thread.Sleep(500);
-
             PlaceTo2.Clear();
-            PlaceTo2.SendKeys(destination2);
-
-            DaysTo.Click();
-            System.Threading.Thread.Sleep(1000);
- 
+            PlaceTo2.SendKeys(destination);
+            PlaceTo2.Click();
         }
 
-        public void ChooseTripDate()
+        public void SetType(Types type)
         {
-            Dates.Click();
-
-            System.Threading.Thread.Sleep(1000);
-            DaysTo.Click();
-            System.Threading.Thread.Sleep(1000);
+            switch (type)
+            {
+                case Types.OneWay:
+                    Type1.Click();
+                    break;
+                case Types.Transfer:
+                    Type2.Click();
+                    break;
+            }
         }
 
-        public void ChooseTrip2Dates()
+        public enum Types
+        {
+            OneWay,
+            Transfer
+        }
+
+        public void AddLeg()
+        {
+            AnotherLeg.Click();
+        }
+        
+        public void ToCalendar()
         {
             Dates.Click();
+        }
 
-            System.Threading.Thread.Sleep(1000);
+        public void ChooseTripDateFrom()
+        {
+            waiter.Until(ExpectedConditions.ElementToBeClickable(DaysFrom));
             DaysFrom.Click();
-            System.Threading.Thread.Sleep(1000);
-            DaysTo.Click();
-            System.Threading.Thread.Sleep(1000);
         }
 
-        public void SelectBusinessType()
+        public void ChooseTripDateTo()
         {
+            waiter.Until(ExpectedConditions.ElementToBeClickable(DaysTo));
+            DaysTo.Click();
+        }
+
+        public void SetBusinessType()
+        {
+            waiter.Until(ExpectedConditions.ElementToBeClickable(Filter1));
             Filter1.Click();
         }
 
         public void AddChild()
         {
+            waiter.Until(ExpectedConditions.ElementToBeClickable(PlusChild));
             PlusChild.Click();
         }
 
         public void AddSenior()
         {
+            waiter.Until(ExpectedConditions.ElementToBeClickable(PlusSenior));
             PlusSenior.Click();
         }
     }
